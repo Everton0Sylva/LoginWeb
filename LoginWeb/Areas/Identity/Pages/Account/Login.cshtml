@@ -1,0 +1,43 @@
+﻿@page
+@model LoginModel
+
+@{
+    ViewData["Title"] = "Log in";
+}
+
+<h1>@ViewData["Title"]</h1>
+<div class="row justify-content-center align-items-center">
+    <div class="col-md-5 mt-5">
+        <section>
+            <h6>Acesse o sistema através de uma das opções</h6>
+            <hr />
+            @{
+                <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
+                    <div class="col-6">
+                        @foreach (var provider in Model.ExternalLogins)
+                        {
+                            if (provider.Name == "Microsoft")
+                            {
+                                <div class="mb-3">
+                                    <button type="submit" class="btn btn-danger" name="provider" value="@provider.Name" title="Login com a conta Microsoft">
+                                        <i class="fab fa-windows me-2 mr-2"></i>Microsoft
+                                    </button>
+                                </div>
+                            }
+                            if (provider.Name == "Google")
+                            {
+                                <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Login com a conta Google">
+                                    <i class="fab fa-google me-2 mr-2"></i>Google
+                                </button>
+                            }
+                        }
+                    </div>
+                </form>
+            }
+        </section>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
