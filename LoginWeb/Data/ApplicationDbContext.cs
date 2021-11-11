@@ -16,8 +16,6 @@ namespace LoginWeb.Data
         }
 
         public DbSet<AuthToken> AuthToken { get; set; }
-        public DbSet<AuthClaim> AuthClaim { get; set; }
-        public DbSet<RoleClaim> RoleClaim { get; set; }
-        public DbSet<UserClaim> UserClaim { get; set; }
     }
+
 }

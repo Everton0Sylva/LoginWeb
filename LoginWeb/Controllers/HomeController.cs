@@ -1,17 +1,13 @@
 ﻿using LoginWeb.Data;
 using LoginWeb.Models;
-using LoginWeb.Views.Home;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
-using Project2.Models;
+using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
+using System.Net.Http;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,17 +18,17 @@ namespace LoginWeb.Controllers
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ILogger<HomeController> _logger;
         private readonly IConfiguration _config;
         private readonly ApplicationDbContext _context;
-        private readonly TokenController tokenController;
-        private readonly ClaimsController claimsController;
 
         public HomeController(ILogger<HomeController> logger,
             SignInManager<IdentityUser> signInManager,
             UserManager<IdentityUser> userManager,
             ApplicationDbContext context,
-            IConfiguration config
+            RoleManager<IdentityRole> roleManager,
+        IConfiguration config
             )
         {
             _userManager = userManager;
@@ -40,8 +36,7 @@ namespace LoginWeb.Controllers
             _logger = logger;
             _config = config;
             _context = context;
-            tokenController = new TokenController(null, signInManager, userManager, context, config);
-            claimsController = new ClaimsController(null, signInManager, userManager, context, config);
+            _roleManager = roleManager;
         }
 
         public async Task<IActionResult> IndexAsync()
@@ -50,12 +45,34 @@ namespace LoginWeb.Controllers
             if (loged)
             {
                 var user = await _userManager.GetUserAsync(User);
-                var provider = Guid.NewGuid().ToString();
-                var token = tokenController.GetToken(user, provider, "access_token");
-             /*   if (token == null)
-                {*/
-                    var newToken = await tokenController.PostToken(user, "Microsoft", "access_token");
-             //   }
+                /*
+                var role = await _roleManager.FindByNameAsync("vendasjunior");
+                if (role == null)
+                {
+                    role = new IdentityRole("vendasjunior");
+                    role.NormalizedName = "Vendas Junior";
+
+                    await _roleManager.CreateAsync(role);
+
+                    await _roleManager.AddClaimAsync(role, new Claim("Cliente", "client.view"));
+                    await _roleManager.AddClaimAsync(role, new Claim("Cliente", "client.create"));
+                    await _roleManager.AddClaimAsync(role, new Claim("Cliente", "client.update"));
+                }
+                if (!await _userManager.IsInRoleAsync(user, role.Name))
+                {
+                    await _userManager.AddToRoleAsync(user, role.Name);
+                }
+                var userRole = await _userManager.GetRolesAsync(user);
+                for (int i = 0; i < userRole.Count; i++)
+                {
+                    var r = await _roleManager.FindByNameAsync(userRole[i]);
+                    var claim = await _roleManager.GetClaimsAsync(r);
+
+                }
+                */
+                //       var provider = _config["Jwt:key"];
+
+                //   }
                 /*
               //  var claim = claimsController.PostClaim("vendasread", "Vendas I", ClaimType.Read);
                 // var role = claimsController.PostRole(user, "vendaswriter", "Vendas II");
@@ -67,7 +84,23 @@ namespace LoginWeb.Controllers
                 var postUserClaim = claimsController.PostUserClaim(user, claim);
             */
 
-                return View();
+                object token;
+                using (var httpClient = new HttpClient())
+                {
+                    var id = "84e3d066-73ae-461f-b163-18023c7d7be7";
+
+                    var postrequest = new StringContent(user.Id.ToString());
+
+
+                    using (var response = await httpClient.PostAsync("https://localhost:44380/api/token/", postrequest))
+                    {
+                        string apiResponse = await response.Content.ReadAsStringAsync();
+                        token = JsonConvert.DeserializeObject(apiResponse);
+                    }
+
+                }
+                return View(token);
+
             }
             return Error();
         }

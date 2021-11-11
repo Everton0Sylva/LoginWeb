@@ -9,9 +9,9 @@ namespace LoginWeb.Views.Home
 {
     public class IndexModel : PageModel
     {
-        public AuthToken authToken { get; set; }
+        public string authToken { get; set; }
 
-        public IndexModel(AuthToken _authToken)
+        public IndexModel(string _authToken)
         {
             authToken = _authToken;
         }

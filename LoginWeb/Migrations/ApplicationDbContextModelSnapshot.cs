@@ -19,29 +19,6 @@ namespace LoginWeb.Migrations
                 .HasAnnotation("ProductVersion", "5.0.11")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("LoginWeb.Models.AuthClaim", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Rule")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("AuthClaim");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
@@ -82,10 +59,6 @@ namespace LoginWeb.Migrations
                     b.Property<string>("ClaimValue")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("RoleId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
@@ -95,8 +68,6 @@ namespace LoginWeb.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetRoleClaims");
-
-                    b.HasDiscriminator<string>("Discriminator").HasValue("IdentityRoleClaim<string>");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUser", b =>
@@ -177,10 +148,6 @@ namespace LoginWeb.Migrations
                     b.Property<string>("ClaimValue")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
@@ -190,8 +157,6 @@ namespace LoginWeb.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("AspNetUserClaims");
-
-                    b.HasDiscriminator<string>("Discriminator").HasValue("IdentityUserClaim<string>");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
@@ -283,30 +248,6 @@ namespace LoginWeb.Migrations
                     b.ToTable("AuthToken");
                 });
 
-            modelBuilder.Entity("LoginWeb.Models.RoleClaim", b =>
-                {
-                    b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>");
-
-                    b.Property<int>("ClaimId")
-                        .HasColumnType("int");
-
-                    b.HasIndex("ClaimId");
-
-                    b.HasDiscriminator().HasValue("RoleClaim");
-                });
-
-            modelBuilder.Entity("LoginWeb.Models.UserClaim", b =>
-                {
-                    b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>");
-
-                    b.Property<int>("ClaimId")
-                        .HasColumnType("int");
-
-                    b.HasIndex("ClaimId");
-
-                    b.HasDiscriminator().HasValue("UserClaim");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -367,28 +308,6 @@ namespace LoginWeb.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("LoginWeb.Models.RoleClaim", b =>
-                {
-                    b.HasOne("LoginWeb.Models.AuthClaim", "Claim")
-                        .WithMany()
-                        .HasForeignKey("ClaimId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Claim");
-                });
-
-            modelBuilder.Entity("LoginWeb.Models.UserClaim", b =>
-                {
-                    b.HasOne("LoginWeb.Models.AuthClaim", "Claim")
-                        .WithMany()
-                        .HasForeignKey("ClaimId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Claim");
                 });
 #pragma warning restore 612, 618
         }

@@ -5,8 +5,6 @@ VisualStudioVersion = 16.0.31702.278
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LoginWeb", "LoginWeb\LoginWeb.csproj", "{CD2029CD-7C60-434A-99CC-D20E3CAF5496}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "APISiscoob", "APISiscoob\APISiscoob.csproj", "{E6912CA0-0530-41BD-B841-ADF9DB6E88B3}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,10 +15,6 @@ Global
 		{CD2029CD-7C60-434A-99CC-D20E3CAF5496}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CD2029CD-7C60-434A-99CC-D20E3CAF5496}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CD2029CD-7C60-434A-99CC-D20E3CAF5496}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E6912CA0-0530-41BD-B841-ADF9DB6E88B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E6912CA0-0530-41BD-B841-ADF9DB6E88B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E6912CA0-0530-41BD-B841-ADF9DB6E88B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E6912CA0-0530-41BD-B841-ADF9DB6E88B3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,23 +1,32 @@
 ﻿using LoginWeb.Data;
 using LoginWeb.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace LoginWeb.Controllers
 {
-    public class ClaimsController : Controller
+    [ApiController]
+    [Route("api/[controller]")]
+    [Authorize(AuthenticationSchemes = "Bearer")]
+    [Authorize(Roles = "Cliente")]
+    public class ClaimsController : ControllerBase
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ILogger<ClaimsController> _logger;
         private readonly IConfiguration _config;
         private readonly ApplicationDbContext _context;
+
 
         // GET: ClaimsController
         public ClaimsController()
@@ -28,6 +37,7 @@ namespace LoginWeb.Controllers
         SignInManager<IdentityUser> signInManager,
         UserManager<IdentityUser> userManager,
         ApplicationDbContext context,
+        RoleManager<IdentityRole> roleManager,
         IConfiguration config
         )
         {
@@ -36,23 +46,24 @@ namespace LoginWeb.Controllers
             _logger = logger;
             _config = config;
             _context = context;
+            _roleManager = roleManager;
         }
 
-        public ActionResult PostClaim(string claimName, string claimRule, ClaimType claimType)
+        [HttpPost]
+        public async Task<ActionResult> PostClaimAsync(IdentityRole role, string claimType, string claimValue)
         {
-            var claim = new AuthClaim();
-            claim.Name = claimName;
-            claim.Rule = claimRule;
-            claim.Type = claimType;
+            var user = await _userManager.GetUserAsync(User);
 
-            _context.AuthClaim.Add(claim);
-            _context.SaveChanges();
+            if (role != null)
+            {
+                return NotFound();
+            }
 
+            var claim = await _roleManager.AddClaimAsync(role, new Claim(claimType, claimValue));
             return Ok(claim);
         }
-
         /*
-         * 
+        [HttpPost]
         public ActionResult PostClaim(IdentityUser nUser, string claimType, string claimValue)
         {
             var userClaim = new IdentityUserClaim<string>();
@@ -66,7 +77,7 @@ namespace LoginWeb.Controllers
 
             return Ok(userClaim);
         }
-        */
+
 
         public ActionResult PostRole(IdentityUser nUser, string roleName = null, string roleNName = null)
         {
@@ -79,8 +90,8 @@ namespace LoginWeb.Controllers
 
             return Ok(role);
         }
-
-
+        */
+        /*
         public ActionResult PostUserRole(IdentityUser nUser, IdentityRole nRole)
         {
             var userClaim = new IdentityUserRole<string>();
@@ -130,16 +141,21 @@ namespace LoginWeb.Controllers
             }
             return elem;
         }
+        */
 
-        public ActionResult<AuthClaim> GetClaim(string roleName)
+        [HttpGet("{id}")]
+        public async Task<ActionResult<IEnumerable<Claim>>> GetClaimAsync(string id)
         {
-            var elem = _context.AuthClaim.FirstOrDefault(p => p.Name.IndexOf(roleName) >= 0);
-            if (elem == null)
+            var role = await _roleManager.FindByIdAsync(id);
+            if (role == null)
             {
                 return NotFound();
             }
-            return elem;
+            var claim = await _roleManager.GetClaimsAsync(role);
+
+            return Ok(claim);
         }
 
-    }
+}
+
 }

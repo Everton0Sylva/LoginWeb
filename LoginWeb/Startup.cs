@@ -8,6 +8,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace LoginWeb
@@ -64,17 +67,86 @@ namespace LoginWeb
 
             services.AddDatabaseDeveloperPageExceptionFilter();
 
-            services.AddDefaultIdentity<IdentityUser>(
-                options =>
+            //SWAGGER
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo
                 {
-                    options.SignIn.RequireConfirmedAccount = false;
-                    options.SignIn.RequireConfirmedEmail = false;
-                    options.SignIn.RequireConfirmedPhoneNumber = false;
-                })
-                .AddRoles<IdentityRole>()
-                .AddEntityFrameworkStores<ApplicationDbContext>()
-                .AddDefaultTokenProviders();
+                    Version = "v1",
+                    Title = "EveAPI",
+                    Description = "Catálogo de Produtos e Categorias",
+                    TermsOfService = new Uri("https://macoratti.net/terms"),
+                    Contact = new OpenApiContact
+                    {
+                        Name = "macoratti",
+                        Email = "macoratti@yahoo.com",
+                        Url = new Uri("https://www.macoratti.net"),
+                    },
+                    License = new OpenApiLicense
+                    {
+                        Name = "Usar sobre LICX",
+                        Url = new Uri("https://macoratti.net/license"),
+                    }
+                });
+                /*
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
+                */
+                var security = new Dictionary<string, IEnumerable<string>>
+                {
+                    {"Bearer", new string[] { }},
+                };
+
+                c.AddSecurityDefinition(
+                   "Bearer",
+                   new OpenApiSecurityScheme
+                   {
+                       In = ParameterLocation.Header,
+                       Description = "Copiar 'bearer ' + token'",
+                       Name = "Authorization",
+                       Type = SecuritySchemeType.ApiKey,
+                       Scheme = "Bearer"
+                   });
+
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        }
+                    }, new string[] {}
+                    } });
+
+            });
+            /*
+            services.AddIdentity<IdentityUser, IdentityRole>(options =>
+            {
+                options.SignIn.RequireConfirmedAccount = false;
+                options.SignIn.RequireConfirmedEmail = false;
+                options.SignIn.RequireConfirmedPhoneNumber = false;
+            }).AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
+            */
+            services.AddDefaultIdentity<IdentityUser>(
+            options =>
+            {
+                options.SignIn.RequireConfirmedAccount = false;
+                options.SignIn.RequireConfirmedEmail = false;
+                options.SignIn.RequireConfirmedPhoneNumber = false;
+            })
+            .AddRoles<IdentityRole>()
+            .AddEntityFrameworkStores<ApplicationDbContext>()
+            .AddDefaultTokenProviders();
+
+            // .AddTokenProvider(Configuration["Jwt:key"], typeof(DataProtectorTokenProvider<IdentityRole>));
+
+
             services.AddControllersWithViews();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -100,6 +172,16 @@ namespace LoginWeb
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            //Swagger
+            app.UseSwagger();
+
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json",
+                        "Teste de Swagger");
+            });
+
 
             app.UseEndpoints(endpoints =>
             {

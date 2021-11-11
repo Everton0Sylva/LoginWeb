@@ -63,12 +63,14 @@ namespace LoginWeb.Areas.Identity.Pages.Account
             {
                 ModelState.AddModelError(string.Empty, ErrorMessage);
             }
+            /*
             var loged = _signInManager.IsSignedIn(User);
             if (loged)
             {
                 var user = await _userManager.GetUserAsync(User);
              //   var token = _tokenController.Get(user);
             }
+            */
             returnUrl ??= Url.Content("~/");
 
             // Clear the existing external cookie to ensure a clean login process
